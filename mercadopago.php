@@ -79,7 +79,13 @@
 	$preference->notification_url = $_SERVER['SERVER_NAME']."/notificacion-mercadopago.php";
 	$preference->save();
 
-	if ($preference->init_point) {
+	/*if ($preference->init_point) {
 		header("location:".$preference->init_point);
-	}
+	}*/
 ?>
+<form action="/procesar-pago" method="POST">
+  <script
+   src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
+   data-preference-id="<?php echo $preference->id; ?>">
+  </script>
+</form>
