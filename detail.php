@@ -100,7 +100,7 @@
                                             <div class="clearfix image-list xs-no-js as-util-relatedlink relatedlink" data-relatedlink="6|Powerbeats3 Wireless Earphones - Neighborhood Collection - Brick Red|MPXP2">
                                                 <div class="as-tilegallery-element as-image-selected">
                                                     <div class=""></div>
-                                                    <img src="./assets/003.jpg" class="ir ir item-image as-producttile-image" alt="" width="445" height="445" style="content:-webkit-image-set(url(<?php echo $_POST['img'] ?>) 2x);">
+                                                    <img src="./assets/003.jpg" class="ir ir item-image as-producttile-image" alt="" width="445" height="445" style="content:-webkit-image-set(url(<?php echo $_POST['img']; ?>) 2x);">
                                                 </div>
                                                 
                                             </div>
@@ -118,7 +118,7 @@
                                         <div class="as-producttile-title">
                                             <h3 class="as-producttile-name">
                                                 <p class="as-producttile-tilelink">
-                                                    <span data-ase-truncate="2"><?php echo $_POST['title'] ?></span>
+                                                    <span data-ase-truncate="2"><?php echo $_POST['title']; ?></span>
                                                 </p>
 
                                             </h3>
@@ -131,7 +131,9 @@
                                         </h3>
                                     </div>
                                     <form action="mercadopago.php" method="post">
-                                        <input type="hidden" name="price" value="<?php echo $_POST['price'] ?>">
+                                        <input type="hidden" name="price" value="<?php echo $_POST['price']; ?>">
+                                        <input type="hidden" name="name" value="<?php echo $_POST['title']; ?>">
+                                        <input type="hidden" name="image" value="<?php echo $_POST['img']; ?>">
                                         <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
                                     </form>
                                 </div>
