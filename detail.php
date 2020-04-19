@@ -134,7 +134,7 @@
                                         <input type="hidden" name="price" value="<?php echo $_POST['price']; ?>">
                                         <input type="hidden" name="name" value="<?php echo $_POST['title']; ?>">
                                         <input type="hidden" name="image" value="<?php echo $_POST['img']; ?>">
-                                        <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
+                                        <button type="submit" class="mercadopago-button" formmethod="post">Pagar la compra</button>
                                     </form>
                                 </div>
                             </div>

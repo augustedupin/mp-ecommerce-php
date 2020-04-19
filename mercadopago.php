@@ -12,25 +12,27 @@
 	$precio = $_POST["price"];
 	$imagen = str_replace( './', '/', $_POST["image"]);
 
-	$imagen = $_SERVER['SERVER_NAME'].$imagen;
+	$imagen = "https://".$_SERVER['SERVER_NAME'].$imagen;
 
 	// Crea un objeto de preferencia
 	$preference = new MercadoPago\Preference();
 	$preference->external_reference = "ABCD1234";
-	//$preference->payment_methods = array(
-		  /*"excluded_payment_methods" => array(
-		    array("id" => "bancomer_atm")
-		  ),*/
-		  /*"excluded_payment_types" => array(
+	$preference->payment_methods = array(
+		  "excluded_payment_methods" => array(
 		    array(
-		    	"id" => "ticket"
+		    	"id" => "amex"
+		    )
+		  ),
+		  "excluded_payment_types" => array(
+		    array(
+		    	"id" => "atm"
 		    ),
-		    array(
+		    /*array(
 		    	"id" =>"atm"
-		    ),
+		    ),*/
 		  ),
 		  "installments" => 6
-		);*/
+		);
 
 	$preference->back_urls = array(
 			    "success" => $_SERVER['SERVER_NAME']."/exitosa-mercadopago.php",
