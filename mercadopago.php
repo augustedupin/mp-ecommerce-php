@@ -76,6 +76,7 @@
 	
 	$preference->items = array($item);
 	$preference->payer = $payer;
+	$preference->notification_url = $_SERVER['SERVER_NAME']."/notificacion-mercadopago.php";
 	$preference->save();
 
 	if ($preference->init_point) {
