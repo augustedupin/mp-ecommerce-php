@@ -3,7 +3,7 @@
     MercadoPago\SDK::setAccessToken('APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389');
 
     $merchant_order = null;
-
+    echo $_GET["topic"]." el pago y la id" .$_GET["id"]; 
     switch($_GET["topic"]) {
         case "payment":
             $payment = MercadoPago\Payment::find_by_id($_GET["id"]);
