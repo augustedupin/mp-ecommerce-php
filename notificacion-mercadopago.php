@@ -7,6 +7,7 @@
     switch($_GET["topic"]) {
         case "payment":
             $payment = MercadoPago\Payment::find_by_id($_GET["id"]);
+            var_dump($payment);
             // Get the payment and the corresponding merchant_order reported by the IPN.
             $merchant_order = MercadoPago\MerchantOrder::find_by_id($payment->order->id);
             break;
