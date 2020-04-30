@@ -1,6 +1,6 @@
 <?php
     require __DIR__."/vendor/autoload.php";
-    require "/functions.php";
+    require __DIR__."/functions.php";
 
     MercadoPago\SDK::setClientId('491494389');
     MercadoPago\SDK::setClientSecret('PP_USR-c82bb1fb-2c75-49b8-b730-2f98c42111fe');
@@ -11,12 +11,22 @@
     // aqui obtengo los parametros que me enviar una vez finalizada la transaccion con mercadopago
     $id_preferencia = $_GET["preference_id"];
     $referencia_externa = $_GET["external_reference"];
+    $order = $_GET["merchant_order_id"];
 
     // obtengo el resultado a traves de la API de mercadopago si es verdad lo que menvia en los paramentros GET para evitar que cualquier persona modifique estes paramentros
-    $pagos = obtenerPago("v1/payments/search?external_reference=".$referencia_externa."&access_token=".$TokenAcceso, "get", null, null, null);
-    $todos_pagos = $pagos["results"];
-    $ultimoStatus = end($todos_pagos);
-    var_dump($todos_pagos);
+    $orden = obtenerPago('merchant_orders/'.$order.'?access_token='.$TokenAcceso, "get", null, null, null);
+    //print_r($orden);
+    $pagos_orden = $orden["payments"];
+    //print_r($pagos_orden);
+    $ultimoPago = end($pagos_orden);
+    $pagos = obtenerPago('v1/payments/'.$ultimoPago["id"].'?access_token='.$TokenAcceso, "get", null, null, null);
+    //print_r($pagos);
+    //var_dump($pagos);
+    //$pagos = obtenerPago("v1/payments/search?external_reference=".$referencia_externa."&access_token=".$TokenAcceso, "get", null, null, null);
+    
+    //$todos_pagos = $pagos["results"];
+    //$ultimoStatus = end($todos_pagos);
+    //var_dump($ultimoStatus);
 ?>
 <!DOCTYPE html>
 <html class="supports-animation supports-columns svg no-touch no-ie no-oldie no-ios supports-backdrop-filter as-mouseuser" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -133,28 +143,20 @@
                                         <div class="as-producttile-title">
                                             <h3 class="as-producttile-name">
                                                 <p class="as-producttile-tilelink">
-                                                    <span data-ase-truncate="2"><?php echo $_POST['title']; ?></span>
+                                                    <span data-ase-truncate="2">Datos.</span>
                                                 </p>
 
                                             </h3>
                                         </div>
-                                        <h3 >
-                                            <?php echo $_POST['price'] ?>
-                                        </h3>
-                                        <h3 >
-                                            <?php echo "$" . $_POST['unit'] ?>
-                                        </h3>
+                                        <?php if ($orden["status"] != '404') {?>
+                                        <h3><?php echo "el metodo de pago fue: ". $pagos["payment_method_id"];?></h3>
+                                        <h3><?php echo "el monto pagado fue: " .$pagos["transaction_amount"]." ".$pagos["currency_id"];?></h3>
+                                        <h3><?php echo "la orden de el pedido es: " .$orden["id"];?></h3>
+                                        <h3><?php echo "La id de el pago es: " .$pagos["id"];?></h3>
+                                        <?php }else{ ?>
+                                        <h3>No existen datos de esta orden.</h3>
+                                        <?php }?>
                                     </div>
-                                    <form action="/procesar-pago" method="POST">
-                                      <script
-                                       src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
-                                       data-preference-id="<?php echo $preference->id; ?>"
-                                       data-header-color="#2D3277"
-                                       data-elements-color="#2D3277"
-                                       data-button-label="Pagar la compra"
-                                       >
-                                      </script>
-                                    </form>
                                 </div>
                             </div>
                         </div>

@@ -1,88 +1,32 @@
 <?php
-    // mercadopago API,  por cierto me dio el siguiente error
-    // al seguir la documentacion Could not find package mercadopago/dx-php in a version matching dev-master
-    require __DIR__  . '/vendor/autoload.php';
+    require __DIR__."/vendor/autoload.php";
+    require __DIR__."/functions.php";
 
-    // Agrega credenciales
-    //MercadoPago\SDK::setAccessToken('APP_USR-6718728269189792-112017-dc8b338195215145a4ec035fdde5cedf-491494389');
-    MercadoPago\SDK::setAccessToken('APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389');
     MercadoPago\SDK::setClientId('491494389');
+    MercadoPago\SDK::setClientSecret('PP_USR-c82bb1fb-2c75-49b8-b730-2f98c42111fe');
+    MercadoPago\SDK::setAccessToken('APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389');
 
-    $created = date("Y-m-d H:i:s", time());
-    $nombre = $_POST["title"];
-    $precio = $_POST["price"];
-    $imagen = str_replace( './', '/', $_POST["img"]);
+    $TokenAcceso = 'APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389';
 
-    $imagen = "http://".$_SERVER['SERVER_NAME'].$imagen;
+    // aqui obtengo los parametros que me enviar una vez finalizada la transaccion con mercadopago
+    $id_preferencia = $_GET["preference_id"];
+    $referencia_externa = $_GET["external_reference"];
+    $order = $_GET["merchant_order_id"];
 
-    // Crea un objeto de preferencia
-    $preference = new MercadoPago\Preference();
-    $preference->external_reference = "ABCD1234";
-    $preference->payment_methods = array(
-          "excluded_payment_methods" => array(
-            array(
-                "id" => "amex"
-            )
-          ),
-          "excluded_payment_types" => array(
-            array(
-                "id" => "atm"
-            ),
-            /*array(
-                "id" =>"atm"
-            ),*/
-          ),
-          "installments" => 6
-        );
-
-    $preference->back_urls = array(
-                "success" => $_SERVER['SERVER_NAME']."/exitosa-mercadopago.php",
-                "failure" => $_SERVER['SERVER_NAME']."/fallida-mercadopago.php",
-                "pending" => $_SERVER['SERVER_NAME']."/pendiente-mercadopago.php"
-    );
-    $preference->auto_return = "approved";
-
-    // Crea un ítem en la preferencia
-    $item = new MercadoPago\Item();
-    $item->id = "1234";
-    $item->title = $nombre;
-    $item->description = "Dispositivo móvil de Tienda e-commerce";
-    $item->quantity = 1;
-    $item->currency_id = "MXN";
-    $item->unit_price = $precio;
-    //$item->picture_url = "https://augustedupin-mp-commerce-php.herokuapp.com/assets/003.jpg";
-    $item->picture_url = $imagen;
-
-    $payer = new MercadoPago\Payer();
-    $payer->name = "Lalo";
-    $payer->surname = "Landa";
-    $payer->email = "test_user_58295862@testuser.com";
-    $payer->phone = array(
-        "area_code" => "55",
-        "number" => "49737300"
-    );
-    //$payer->date_created = $created;
-    $payer->address = array(
-        "street_name" => "Insurgentes Sur",
-        "street_number" => 1602,
-        "zip_code" => "03940"
-    );
-
-    /*$shipments = new MercadoPago\Shipments();
-        $shipments->receiver_address = array(
-              "zip_code" => "15510",
-              "street_number" => "473 D Bis",
-              "street_name" => "norte 164"
-    );*/
+    // obtengo el resultado a traves de la API de mercadopago si es verdad lo que menvia en los paramentros GET para evitar que cualquier persona modifique estes paramentros
+    $orden = obtenerPago('merchant_orders/'.$order.'?access_token='.$TokenAcceso, "get", null, null, null);
+    //print_r($orden);
+    $pagos_orden = $orden["payments"];
+    //print_r($pagos_orden);
+    $ultimoPago = end($pagos_orden);
+    $pagos = obtenerPago('v1/payments/'.$ultimoPago["id"].'?access_token='.$TokenAcceso, "get", null, null, null);
+    //print_r($pagos);
+    //var_dump($pagos);
+    //$pagos = obtenerPago("v1/payments/search?external_reference=".$referencia_externa."&access_token=".$TokenAcceso, "get", null, null, null);
     
-    $preference->items = array($item);
-    $preference->payer = $payer;
-    $preference->notification_url = $_SERVER['SERVER_NAME']."/notificacion-mercadopago.php";
-    $preference->save();
-
-    /*if ($preference->init_point) {
-        header("location:".$preference->init_point);
-    }*/
+    //$todos_pagos = $pagos["results"];
+    //$ultimoStatus = end($todos_pagos);
+    //var_dump($ultimoStatus);
 ?>
 <!DOCTYPE html>
 <html class="supports-animation supports-columns svg no-touch no-ie no-oldie no-ios supports-backdrop-filter as-mouseuser" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -141,7 +85,7 @@
                                     <img src="./assets/music-audio-alp-201709" alt="" width="1440" height="320" data-scale-params-2="wid=2880&amp;hei=640&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1503948581306" class="pd-billboard-hero ir">
                                 </div>
                                 <div class="pd-billboard-info">
-                                    <h1 class="pd-billboard-header pd-util-compact-small-18">Tienda e-commerce</h1>
+                                    <h1 class="pd-billboard-header pd-util-compact-small-18">Resultado MercadoPago</h1>
                                 </div>
                             </div>
                         </div>
@@ -160,14 +104,9 @@
                         <div class="as-searchnav-placeholder" style="height: 77px;">
                             <div class="row as-search-navbar" id="as-search-navbar" style="width: auto;">
                                 <div class="as-accessories-filter-tile column large-6 small-3">
-
-                                    <button class="as-filter-button" aria-expanded="true" aria-controls="as-search-filters" type="button">
                                         <h2 class=" as-filter-button-text">
-                                            Smartphones
+                                            Pago rechazado
                                         </h2>
-                                    </button>
-
-
                                 </div>
 
                             </div>
@@ -204,34 +143,18 @@
                                         <div class="as-producttile-title">
                                             <h3 class="as-producttile-name">
                                                 <p class="as-producttile-tilelink">
-                                                    <span data-ase-truncate="2"><?php echo $_POST['title']; ?></span>
+                                                    <span data-ase-truncate="2">Datos.</span>
                                                 </p>
 
                                             </h3>
                                         </div>
-                                        <h3 >
-                                            <?php echo $_POST['price'] ?>
-                                        </h3>
-                                        <h3 >
-                                            <?php echo "$" . $_POST['unit'] ?>
-                                        </h3>
+                                        <?php if ($orden["status"] != '404') {?>
+                                        <h3><?php echo "el metodo de pago fue: ". $pagos["payment_method_id"];?></h3>
+                                        <h3><?php echo "el monto que no se pudo pagar es: " .$pagos["transaction_amount"]." ".$pagos["currency_id"];?></h3>
+                                        <?php }else{ ?>
+                                        <h3>No existen datos de esta orden.</h3>
+                                        <?php }?>
                                     </div>
-                                    <form action="" method="POST">
-                                      <script
-                                       src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
-                                       data-preference-id="<?php echo $preference->id; ?>"
-                                       data-header-color="#2D3277"
-                                       data-elements-color="#2D3277"
-                                       data-button-label="Pagar la compra"
-                                       >
-                                      </script>
-                                    </form>
-                                    <form action="mercadopago.php" method="POST">
-                                        <input type="hidden" value="<?php echo $_POST["title"];?>" name="title"/>
-                                        <input type="hidden" value="<?php echo $_POST["price"];?>" name="price"/>
-                                        <input type="hidden" value="<?php echo $_POST["img"];?>" name="img"/>
-                                          <button type="submit" class="mercadopago-button" formmethod="post">Pagar la compra</button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -247,5 +170,6 @@
                 </div>
             </div>
         </div>
+    <div class="stact"></div>
 
 </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div class="mp-mercadopago-checkout-wrapper" style="z-index:-2147483647;display:block;background:rgba(0, 0, 0, 0.7);border:0;overflow:hidden;visibility:hidden;margin:0;padding:0;position:fixed;left:0;top:0;width:0;opacity:0;height:0;transition:opacity 220ms ease-in;"> <svg class="mp-spinner" viewBox="25 25 50 50"> <circle class="mp-spinner-path" cx="50" cy="50" r="20" fill="none" stroke-miterlimit="10"></circle> </svg> </div><div id="ac-gn-viewport-emitter"> </div></body></html>
