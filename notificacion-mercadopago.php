@@ -34,4 +34,4 @@
     } else {
         print_r("Not paid yet. Do not release your item.");
     }
-?.
+?>
