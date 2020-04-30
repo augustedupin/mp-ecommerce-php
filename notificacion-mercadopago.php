@@ -1,9 +1,12 @@
 <?php
     require __DIR__  . '/vendor/autoload.php';
+    require_once "phpmailer/PHPMailerAutoload.php";
+    require_once "phpmailer/class.phpmailer.php";
+    require_once "phpmailer/class.smtp.php";
+
     MercadoPago\SDK::setAccessToken('APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389');
 
-    $merchant_order = null;
-    echo $_GET["topic"]." el pago y la id" .$_GET["id"]; 
+    $merchant_order = null; 
     switch($_GET["topic"]) {
         case "payment":
             $payment = MercadoPago\Payment::find_by_id($_GET["id"]);
@@ -34,5 +37,35 @@
         }
     } else {
         print_r("Not paid yet. Do not release your item.");
+    }
+
+            //Procesamos el email a enviar
+    $body = "<p> El topico es".$_GET["topic"]." y la id es ".$_GET["id"]."</p>";
+    $mail = new PHPMailer();
+    $mail->IsSMTP();
+    $mail->SMTPAuth = true;
+    $mail->SMTPSecure = 'tls';
+    $mail->Host = "mail.sunmex.com"; // SMTP a utilizar. Por ej. smtp.elserver.com
+    $mail->Username = "admin@sunmex.com"; // Correo completo a utilizar
+    $mail->Password = "bu7PKNnDIBqD"; // Contraseña
+    $mail->Port = 587; // Puerto a utilizar
+    $mail->From = "admin@sunmex.com"; // Desde donde enviamos (Para mostrar)
+    $mail->FromName = "Postmaster Sunmex";
+    $mail->AddAddress("cdabraxas377@gmail.com"); // Esta es la dirección a donde enviamos
+        //$mail->AddAddress("javierbzn.vidafull@gmail.com"); // Esta es la dirección de prueba.
+        //$mail->AddAddress("cdelgado.vidafull@gmail.com"); // Esta es la dirección de prueba.
+        //$mail->AddCC("cuenta@dominio.com"); // Copia
+        //$mail->AddBCC("cuenta@dominio.com"); // Copia oculta
+
+    $mail->IsHTML(true); // El correo se envía como HTML
+    $mail->Subject = "Respuesta de mercadopago"; // Este es el titulo del email.
+    $mail->Body = $body; // Mensaje a enviar
+
+    $exito = $mail->Send(); // Envía el correo.
+
+    if($exito) {
+            echo "exito";
+    } else {
+            echo 'Hubo un inconveniente. Contacta a un administrador.';
     }
 ?>
