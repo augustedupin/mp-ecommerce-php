@@ -216,16 +216,7 @@
                                             <?php echo "$" . $_POST['unit'] ?>
                                         </h3>
                                     </div>
-                                    <form action="" method="POST">
-                                      <script
-                                       src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
-                                       data-preference-id="<?php echo $preference->id; ?>"
-                                       data-header-color="#2D3277"
-                                       data-elements-color="#2D3277"
-                                       data-button-label="Pagar la compra"
-                                       >
-                                      </script>
-                                    </form>
+
                                     <form action="mercadopago.php" method="POST">
                                         <input type="hidden" value="<?php echo $_POST["title"];?>" name="title"/>
                                         <input type="hidden" value="<?php echo $_POST["price"];?>" name="price"/>
