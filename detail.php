@@ -4,7 +4,8 @@
     require __DIR__  . '/vendor/autoload.php';
 
     // Agrega credenciales
-    MercadoPago\SDK::setAccessToken('APP_USR-6718728269189792-112017-dc8b338195215145a4ec035fdde5cedf-491494389');
+    //MercadoPago\SDK::setAccessToken('APP_USR-6718728269189792-112017-dc8b338195215145a4ec035fdde5cedf-491494389');
+    MercadoPago\SDK::setAccessToken('APP_USR-6588866596068053-041607-428a530760073a99a1f2d19b0812a5b6-491494389');
     MercadoPago\SDK::setClientId('491494389');
 
     $created = date("Y-m-d H:i:s", time());
